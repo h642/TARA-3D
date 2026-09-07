@@ -1,3 +1,4 @@
+cat << 'EOF' > app.py
 import os
 import cv2
 import numpy as np
@@ -66,3 +67,4 @@ async def process_image(file: UploadFile = File(...)):
             "max_val": 100.0 if is_georeferenced else 1.0
         }
     }
+EOF
