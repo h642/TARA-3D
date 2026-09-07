@@ -1,41 +1,41 @@
-# DepthWizard: Single-View Metric DSM Reconstruction Pipeline
+# DepthWizard (TARA-3D): Single-View Metric DSM Reconstruction Pipeline
 
-DepthWizard is an end-to-end geospatial AI system designed to reconstruct metric 3D Digital Surface Models (DSMs) from a single 2D optical satellite or aerial image. By pairing a fine-tuned monocular depth foundation model with automated spatial anchoring against coarse base Digital Elevation Models (such as NASA SRTM), DepthWizard transforms 2D satellite imagery into real-world, calibrated 3D elevation models for interactive browser-based flythroughs.
+DepthWizard is an end-to-end geospatial AI system designed to reconstruct metric 3D Digital Surface Models (DSMs) from a single 2D optical satellite or aerial image. By pairing a fine-tuned monocular depth foundation model with automated spatial anchoring against coarse base Digital Elevation Models (ISRO CartoDEM / NASA SRTM) DepthWizard transforms 2D satellite imagery into real-world, calibrated 3D elevation models for interactive browser-based flythroughs.
 
 ---
 ```text
 ## Technical Architecture
 
-[ Input Image (GeoTIFF / JPG) ]
-               │
-               ▼
-   [ Fast Geospatial Ingestion ]
-   (CRS Parsing via Rasterio & Affine GeoTransform)
-               │
-               ▼
-  [ Monocular Depth Estimation ]
-  (Depth Anything v2 Fine-Tuned Backbone)
-               │
-               ▼
-  [ Relative Depth Normalization ]
-               │
-               ▼
- [ RANSAC Scale & Shift Alignment ] ◄─── [ 30m SRTM Base DEM ]
- (Affine Anchoring: Elevation = s * Depth + t)
-               │
-               ▼
-[ Metric DSM / Displacement Heightmap ]
-               │
-               ▼
- [ Client-Side WebGL / Three.js Mesh ]
- (Real-time Raycast Probe, Elevation Heatmap, Orbit Flythrough)
 
----
+             [ Input Image (GeoTIFF / JPG) ]
+                            │
+                            ▼
+               [ Fast Geospatial Ingestion ]
+      (CRS Parsing via Rasterio & Affine GeoTransform)
+                            │
+                            ▼
+              [ Monocular Depth Estimation ]
+          (Depth Anything v2 Fine-Tuned Backbone)
+                            │
+                            ▼
+              [ Relative Depth Normalization ]
+                            │
+                            ▼
+     [ Hybrid Huber-RANSAC Alignment ] ◄─── [ ISRO CartoDEM / SRTM 30m ]
+    (Solar Shadow H = L·tan θ + Affine s, t)
+                            │
+                            ▼
+          [ Metric DSM / Displacement Heightmap ]
+                            │
+                            ▼
+             [ Client-Side WebGL / Three.js Mesh ]
+    (Real-time Raycast Probe, Elevation Heatmap, Orbit Flythrough)
+
 ```
 ## Key Features
 
 * Single-View Height Estimation: Predicts detailed structural depth directly from monocular cues (shadows, perspective, occlusion) without requiring stereo pairs or dedicated LiDAR passes.
-* Automated Metric Calibration: Solves the linear system h = s * d + t against localized coarse reference terrain. Uses RANSAC regression to treat buildings and vegetation as statistical outliers, locking the base translation strictly to bare-earth datum.
+* Metric Calibration: Hybrid Huber-RANSAC solver combining deterministic solar shadow ray-marching (H = L · tan θ) with localized 30m base DEM anchoring.
 * Dual Processing Paths:
   * Georeferenced Mode (GeoTIFF): Reads projection metadata (e.g., EPSG:4326, EPSG:3857), runs affine calibration, and generates metric elevation outputs.
   * Relative Mode (Standard JPG/PNG): Normalizes values to relative structural depth (rDSM) when spatial reference headers are absent.
