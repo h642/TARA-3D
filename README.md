@@ -50,12 +50,15 @@ DepthWizard is an end-to-end geospatial AI system designed to reconstruct metric
 
 depthwizard/
 ├── backend/
-│   ├── app.py                # FastAPI server, inference pipeline, & CORS handling
-│   ├── requirements.txt      # Python dependencies
-│   └── outputs/              # Cached input files, generated heightmaps, & TIFFs
+│   ├── app.py                 # FastAPI service handling uploads & routing
+│   ├── depth_engine.py        # Monocular depth inference (Depth Anything v2)
+│   ├── calibrator.py          # SRTM fetcher & RANSAC scale-shift calibration
+│   └── validator.py           # RMSE, MAE, & correlation calculator
 ├── frontend/
-│   └── index.html            # Three.js 3D viewer & QGIS-style HUD
-└── README.md
+│   ├── index.html             # UI container with Three.js canvas & controls
+│   └── viewer.js              # 3D terrain displacement, fly controls & hover probe
+├── requirements.txt
+└── run.sh
 
 ---
 ```
