@@ -48,7 +48,7 @@ DepthWizard is an end-to-end geospatial AI system designed to reconstruct metric
 ```text
 ## Project Structure
 
-depthwizard/
+TARA-3D/
 ├── backend/
 │   ├── app.py                 # FastAPI service handling uploads & routing
 │   ├── depth_engine.py        # Monocular depth inference (Depth Anything v2)
